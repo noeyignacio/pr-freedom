@@ -1,5 +1,5 @@
-const app = require('./config/server')
-require('./config/database')
+import app from './config/server.js'
+import './config/database.js'
  
 const port = app.get('port')
 

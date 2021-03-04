@@ -1,4 +1,4 @@
-const Post = require('../models/Posts')
+import Post from '../models/Posts.js'
 
 // [TEST] Printing `Hello World`
 const helloWorld = (req, res) => {
@@ -134,5 +134,6 @@ const deletePost = async (req, res) => {
     }
 }
 
-
-module.exports = { helloWorld, createPost, readPosts, readPost, updatePost, deletePost } 
+export default {
+    helloWorld, createPost, readPosts, readPost, updatePost, deletePost
+}

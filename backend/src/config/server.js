@@ -1,12 +1,14 @@
-const express = require('express')
-const morgan = require('morgan')
-require('dotenv').config()
+import express from 'express'
+import morgan from 'morgan'
+import dotenv from 'dotenv'
+dotenv.config()
 
 // Initialize
 const app = express()
 
 // Routes
-const postRoutes = require('../routes/posts.route')
+import postRoutes from '../routes/rPost.js'
+
 
 /* ** Settings ** */
 // Local Port
@@ -20,4 +22,4 @@ app.use(morgan('tiny'))
 // Routers
 app.use('/api/v1/posts', postRoutes)
 
-module.exports = app;
+export default app;

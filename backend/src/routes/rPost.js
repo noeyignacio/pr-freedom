@@ -1,7 +1,7 @@
-const express = require('express')
+import express from 'express'
 
 // Controllers
-const postController = require('../controllers/posts.controller')
+import postController from '../controllers/cPost.js'
 
 // Router Initializer
 const router = express.Router()
@@ -25,5 +25,5 @@ router.patch('/update/:id', postController.updatePost)
 // Deleting Post
 router.delete('/delete/:id', postController.deletePost)
 
-module.exports = router
+export default router;
 
