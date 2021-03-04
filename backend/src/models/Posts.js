@@ -4,7 +4,6 @@ const PostSchema = new mongoose.Schema({
     authorName: {
         type: String,
         required: true,
-        default: "Anonymous",
     },
     postContent: {
         type: String,

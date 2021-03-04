@@ -1,6 +1,6 @@
-const postSchema = require('../models/Posts')
+const Post = require('../models/Posts')
 
-// Printing `Hello World`
+// [TEST] Printing `Hello World`
 const helloWorld = (req, res) => {
     res.status(200).json({
         message: 'Hello World!'
@@ -8,16 +8,16 @@ const helloWorld = (req, res) => {
 }
 
 // Creating Post
-const createPost = (req, res) => {
+const createPost = async (req, res) => {
 
-    const newPost = new postSchema({
+    const newPost = new Post({
         authorName: req.body.authorName,
         postContent: req.body.postContent,
     })
-
-    newPost.save()
+    await newPost
+        .save()
         .then(() => {
-            // Server Server Response
+            // Server Response
             console.log(`${req.body.authorName}_POSTED`)
             // Web Response
             res.status(200).json({
@@ -35,15 +35,39 @@ const createPost = (req, res) => {
 }
 
 // Reading All Posts
-const readPosts = (req, res) => {
+const readPosts = async (req, res) => {
 
+    try {
+        const posts = await Post.find()
+        if (posts.length == 0) {
+            // Server Response
+            console.log("NO_POST_AVAILABLE")
+            // Web Response
+            res.status(200).json({
+                message: "No posts found."
+            })
+        } else {
+            res.status(200).json(posts)
+        }
+    } catch (err) {
+        // Server Response
+        console.log('GETTING_ALL_POST_ERROR')
+        // Web Response
+        res.status(500).json({
+            error: err,
+            message: "No posts found."
+        })
+    }
 }
 
-// Reading Post by ID
-const readPost = (req, res) => {
-    postSchema.findById({_id: req.params.id}, (err, results) => {
+// Reading Post by ID (Specific)
+const readPost = async (req, res) => {
+
+    await Post.findById({_id: req.params.id}, (err, results) => {
             if (err) {
+                // Server Response
                 console.log(err, "POST_NOT_EXSIST")
+                // Web Response
                 res.status(500).json({
                     message: err
                 })
@@ -61,22 +85,28 @@ const readPost = (req, res) => {
 }
 
 // Updating Post
-const updatePost = (req, res) => {
+const updatePost = async (req, res) => {
 
-    const postUpdate = postSchema.findOneAndUpdate({_id: req.params.id}, {
+    const postUpdate = await Post.updateOne({_id: req.params.id}, {
         $set: {
             postContent: req.body.postContent,
+            isUpdated: true,
+
         },
-    }, {
-        new: true,
     })
     if (postUpdate) {
+        // Server Response
+        console.log("UPDATE_SUCCESS")
+        // Web Response
+        const updatedPost = await Post.findById({_id: req.params.id})
         res.status(200).json({
-            message: "Post successfully updated!",
-            isUpdated: "true",
+            updatedPost: updatedPost,
+            message: "Post updated successfully!"
         })
     } else {
+        // Server Response
         console.log("UPDATE_ERROR")
+        // Web Response
         res.status(500).json({
             message: "Post wasn't able to update."
         })
@@ -85,10 +115,23 @@ const updatePost = (req, res) => {
 
 
 // Deleting Post
-const deletePost = (req, res) => {
-    res.status(200).json({
-        message: 'Successfully deleted the Post!'
-    })
+const deletePost = async (req, res) => {
+    
+    try {
+        await Post.remove({
+            _id: req.params.id,
+        })
+        console.log(`POST_DELETED`)
+        res.status(200).json({
+            message: "Post Deleted successfully!"
+        })
+    } catch (err) {
+        console.log('POST_NOT_EXSIST')
+        res.status(500).json({ 
+            error: err,
+            message: "Post does not exist!" 
+        })
+    }
 }
 
 

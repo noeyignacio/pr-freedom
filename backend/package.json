@@ -4,7 +4,10 @@
   "description": "Backend Infrastructure",
   "main": "server.js",
   "scripts": {
-    "dev:watch": "concurrently -n 'SERER' -c 'red' \"nodemon src/app.js\""
+    "watch:frontend": "cd .. && cd frontend && npm start",
+    "watch:backend": "nodemon src/app.js",
+    "dev:watch" : "concurrently -n 'CLIENT,SERVER' -c 'blue,red' \"npm run watch:frontend\" \"npm run watch:backend\"",
+    "dev:backend" : "concurrently -n 'SERVER' -c'red' \"watch:backend\""
   },
   "author": "Prominence",
   "license": "MIT",
@@ -12,7 +15,8 @@
     "bcrypt": "^5.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.11.15"
+    "mongoose": "^5.11.15",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "concurrently": "^6.0.0",
