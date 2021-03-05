@@ -1,29 +1,36 @@
 import express from 'express'
 
 // Controllers
-import postController from '../controllers/cPost.js'
+import {
+    helloWorld,
+    createPost,
+    readPost,
+    readPosts,
+    updatePost,
+    deletePost
+} from '../controllers/cPost.js'
 
 // Router Initializer
 const router = express.Router()
 
 /* ** Routers ** */
 // Hello World (Test)
-router.post('/hello', postController.helloWorld)
+router.post('/hello', helloWorld)
 
 // Creating Post
-router.post('/create', postController.createPost)
+router.post('/create', createPost)
 
 // Reading Post
-router.get('/read', postController.readPosts)
+router.get('/read', readPosts)
 
 // Reading Post
-router.get('/read/:id', postController.readPost)
+router.get('/read/:id', readPost)
 
 // Updating Post
-router.patch('/update/:id', postController.updatePost)
+router.patch('/update/:id', updatePost)
 
 // Deleting Post
-router.delete('/delete/:id', postController.deletePost)
+router.delete('/delete/:id', deletePost)
 
 export default router;
 
