@@ -12,5 +12,9 @@ mongoose.connect(MONGODB_URI, {
     useCreateIndex: true,
     useFindAndModify: false,
 })
-    .then(() => console.log(`Database is Connected!`))
+    .then(() => 
+        console.log(
+            `Database is Connected!\n======================`
+        )
+    )
     .catch(err => console.error(err))
