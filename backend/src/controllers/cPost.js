@@ -1,41 +1,48 @@
-import Post from '../models/Posts.js'
+import Post from '../models/mPosts.js'
+import { createPostValidator, updatePostValidator } from '../middlewares/validator.js'
 
 // [TEST] Printing `Hello World`
-const helloWorld = (req, res) => {
+export const helloWorld = (req, res) => {
     res.status(200).json({
-        message: 'Hello World!'
+        message: "Hello World!"
     })
 }
 
-// Creating Post
-const createPost = async (req, res) => {
+// Creating Post 
+export const createPost = async (req, res) => {
 
-    const newPost = new Post({
-        authorName: req.body.authorName,
-        postContent: req.body.postContent,
-    })
-    await newPost
-        .save()
-        .then(() => {
-            // Server Response
-            console.log(`${req.body.authorName}_POSTED`)
-            // Web Response
-            res.status(200).json({
-                authorName: req.body.authorName,
-                postContent: req.body.postContent,
-                message: "Post created successfully!"
-            })
+    try {
+        const newPost = new Post({
+            authorName: req.body.authorName,
+            postContent: req.body.postContent,
         })
-        .catch(err => {
-            console.log('POST_ERROR')
-            res.status(500).json({
-                message: err.message
+        const post = await createPostValidator.validateAsync(req.body)
+        if (post) {
+            await newPost
+            .save()
+            .then(() => {
+                // Server Response
+                console.log(`${req.body.authorName}_CREATED_POST`)
+                // Web Response
+                res.status(200).json({
+                    authorName: req.body.authorName,
+                    postContent: req.body.postContent,
+                    message: "Post Created Successfully!"
+                })
             })
+        }
+    } catch (error) {
+        // Server Response
+        console.log("POST_ERROR")
+        // Web Response
+        res.status(500).json({
+            message: error.message
         })
+    }
 }
 
 // Reading All Posts
-const readPosts = async (req, res) => {
+export const readPosts = async (req, res) => {
 
     try {
         const posts = await Post.find()
@@ -49,27 +56,28 @@ const readPosts = async (req, res) => {
         } else {
             res.status(200).json(posts)
         }
-    } catch (err) {
+    } catch (error) {
         // Server Response
         console.log('GETTING_ALL_POST_ERROR')
         // Web Response
         res.status(500).json({
-            error: err,
+            error: error.message,
             message: "No posts found."
         })
     }
 }
 
 // Reading Post by ID (Specific)
-const readPost = async (req, res) => {
+export const readPost = async (req, res) => {
 
-    await Post.findById({_id: req.params.id}, (err, results) => {
-            if (err) {
+    await Post.findById({_id: req.params.id}, (error, results) => {
+            if (error) {
                 // Server Response
-                console.log(err, "POST_NOT_EXSIST")
+                console.log(error, "POST_NOT_EXSIST")
                 // Web Response
                 res.status(500).json({
-                    message: err
+                    message: "No Post Exists.",
+                    error: error.message,
                 })
             } else {
                 res.status(200).json({
@@ -80,42 +88,44 @@ const readPost = async (req, res) => {
                     createdAt: results.createdAt,
                 })
             }
-        }
-    )
+    })
 }
 
 // Updating Post
-const updatePost = async (req, res) => {
+export const updatePost = async (req, res) => {
 
-    const postUpdate = await Post.updateOne({_id: req.params.id}, {
-        $set: {
-            postContent: req.body.postContent,
-            isUpdated: true,
-
-        },
-    })
-    if (postUpdate) {
-        // Server Response
-        console.log("UPDATE_SUCCESS")
-        // Web Response
-        const updatedPost = await Post.findById({_id: req.params.id})
-        res.status(200).json({
-            updatedPost: updatedPost,
-            message: "Post updated successfully!"
-        })
-    } else {
+    try {
+        const postUpdate = await Post.findById(req.params.id)
+        const post = await updatePostValidator.validateAsync(req.body)
+        if (post) {
+            postUpdate.postContent = req.body.postContent
+            await postUpdate
+            .save()
+            .then(() => {
+                // Server Response
+                console.log(`${req.body.authorName}_UPDATED_POST`)
+                // Web Response
+                res.status(200).json({
+                    authorName: req.body.authorName,
+                    postContent: req.body.postContent,
+                    message: "Post Updated Successfully!"
+                })
+            })
+        }
+    } catch (error) {
         // Server Response
         console.log("UPDATE_ERROR")
         // Web Response
         res.status(500).json({
-            message: "Post wasn't able to update."
+            message: "Post wasn't able to update.",
+            error: error.message
         })
     }
 }
 
 
 // Deleting Post
-const deletePost = async (req, res) => {
+export const deletePost = async (req, res) => {
     
     try {
         await Post.remove({
@@ -125,15 +135,11 @@ const deletePost = async (req, res) => {
         res.status(200).json({
             message: "Post Deleted successfully!"
         })
-    } catch (err) {
+    } catch (error) {
         console.log('POST_NOT_EXSIST')
         res.status(500).json({ 
-            error: err,
+            error: error.message,
             message: "Post does not exist!" 
         })
     }
-}
-
-export default {
-    helloWorld, createPost, readPosts, readPost, updatePost, deletePost
 }
