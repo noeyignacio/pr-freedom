@@ -4,8 +4,6 @@ const PostSchema = new mongoose.Schema({
     authorName: {
         type: String,
         required: true,
-        min: 6,
-        max: 30
     },
     postContent: {
         type: String,
